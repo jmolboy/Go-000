@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"jmolboy/homework/week02/app/dao"
 	"jmolboy/homework/week02/app/service"
 )
 
@@ -21,7 +20,7 @@ func main() {
 	*/
 	newsSvs := service.NewsService{}
 	news, err := newsSvs.Find(0)
-	if err != nil && dao.IsNoRecordErr(err) {
+	if err != nil && service.IsNoRecordErr(err) {
 		fmt.Printf("no record found", err)
 	} else if (err != nil) {
 		fmt.Printf("%+v\n", err)
