@@ -20,11 +20,24 @@ func main() {
 	*/
 	newsSvs := service.NewsService{}
 	news, err := newsSvs.Find(0)
-	if err != nil && service.IsNoRecordErr(err) {
-		fmt.Printf("no record found", err)
-	} else if (err != nil) {
+	if err != nil {
+
+		// 判定是否是未查到任何记录
+		if service.IsNoRecordErr(err) {
+			fmt.Printf("%+v\n", err)
+			return
+		}
+
+		// 判定是否是查询时异常
+		if service.IsQueryFailErr(err) {
+			fmt.Printf("%+v\n", err)
+			return
+		}
+
 		fmt.Printf("%+v\n", err)
-	} else {
-		fmt.Printf("news id:%d", news.Id)
+		return
 	}
+
+	fmt.Printf("news id:%d", news.Id)
+
 }

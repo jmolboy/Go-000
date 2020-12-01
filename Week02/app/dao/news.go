@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"jmolboy/homework/week02/app/model"
+	"log"
 )
 
 type NewsDao struct {
@@ -11,17 +12,17 @@ type NewsDao struct {
 }
 
 func (newsDao *NewsDao) Find(id int) (*model.News, error) {
-	_, err := query("select * from tablenews where id=1 limit 1")
+	_, err := query("select * from news where id=1 limit 1")
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		return nil, &noRecordErr{Err: err, Msg: "未发现记录"}
 	}
 
 	if err != nil {
 		//记录日志
-		// log.Fatal(err)
+		log.Fatal(err)
 
-		// 返回未发现记录
-		return nil, &noRecordErr{Err: err, Msg: "访问异常"}
+		// 返回查询失败queryFail类型error
+		return nil, &queryFailErr{Err: err, Msg: "访问异常"}
 	}
 
 	news := &model.News{}
