@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"jmolboy/homework/week02/app/model"
-	"log"
 )
 
 type NewsDao struct {
@@ -19,7 +18,6 @@ func (newsDao *NewsDao) Find(id int) (*model.News, error) {
 
 	if err != nil {
 		//记录日志
-		log.Fatal(err)
 
 		// 返回查询失败queryFail类型error
 		return nil, &queryFailErr{Err: err, Msg: "访问异常"}
