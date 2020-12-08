@@ -11,8 +11,7 @@ import (
 )
 
 func main() {
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	grp, errCtx := errgroup.WithContext(ctx)
+	grp, errCtx := errgroup.WithContext(context.Background())
 
 	grp.Go(func() error {
 		return startHttpServer1(errCtx)
@@ -23,10 +22,9 @@ func main() {
 	})
 
 	grp.Go(func() error {
-		return listenSig(cancelFunc)
+		return listenSig(errCtx)
 	})
 
-	fmt.Println("begin wait")
 	if err := grp.Wait(); err != nil {
 		fmt.Printf("exited: %s\n", err.Error())
 	}
@@ -76,7 +74,7 @@ func startHttpServer2(pctx context.Context) error {
 	return s.ListenAndServe()
 }
 
-func listenSig(cancelFunc context.CancelFunc) error {
+func listenSig(ctxt context.Context) error {
 	// Go signal notification works by sending `os.Signal`
 	// values on a channel. We'll create a channel to
 	// receive these notifications (we'll also make one to
@@ -87,11 +85,13 @@ func listenSig(cancelFunc context.CancelFunc) error {
 	// receive notifications of the specified signals.
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	select {
-	case <-sigs:
-		fmt.Println("get sig to exist")
-		cancelFunc()
-		// 退出
+	for {
+		select {
+		case s := <-sigs:
+			fmt.Println("get sig to exist")
+			return fmt.Errorf("get %v signal", s)
+		case <-ctxt.Done():
+			return fmt.Errorf("signal routine：other work done")
+		}
 	}
-	return nil
 }
