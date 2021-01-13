@@ -1,1 +1,4 @@
-package Week01
+package main
+
+func main()  {
+}
